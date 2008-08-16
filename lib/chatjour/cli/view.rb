@@ -26,6 +26,8 @@ module Chatjour
       def display_help
         @output.puts "\t/users", 
                      "\t/help", 
+                     "\t/available [message]",
+                     "\t/away [message]",
                      "\t/username message", 
                      "\tmessage"
       end
