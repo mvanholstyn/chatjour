@@ -1,9 +1,6 @@
 #!/usr/bin/env ruby
 
 require 'chatjour'
+require 'chatjour/cli'
 
-trap "INT" do
-  exit!
-end
-
-Chatjour::Application.run(*ARGV)
+Chatjour::Cli::Runner.start
