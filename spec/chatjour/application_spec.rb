@@ -77,6 +77,8 @@ describe Chatjour::Application do
       ]
     end
   end
+  
+  it "needs to receive messages with user attached"
 
   it "receives nothing when there is nothing there to receive" do
     socket = mock("socket", :null_object => true)
