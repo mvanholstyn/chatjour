@@ -53,7 +53,7 @@ EOUSER
       def display_messages(messages)
         messages.each do |message|
           write <<-EOUSER
-Message:
+#{message.user.name}:
   #{message.body}
 EOUSER
         end
