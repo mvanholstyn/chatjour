@@ -2,9 +2,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe Chatjour::Application do
   before(:each) do
-    @broadcast = stub("broadcast", :stop => nil)
-    DNSSD.stub!(:register).and_return(@broadcast)
-    
     @browser = mock("browser", :stop => nil)
     DNSSD.stub!(:browse).and_return(@browser)
   end
@@ -94,29 +91,4 @@ describe Chatjour::Application do
     UDPSocket.should_receive(:new).and_return(socket)    
     Chatjour::Application.new.start do |app|; end
   end
-
-  it "broadcasts itself on the network right away" do
-    text_record = DNSSD::TextRecord.new
-    text_record['placeholder'] = "so this resolves"
-    DNSSD.should_receive(:register).with(
-      Etc.getlogin, 
-      "_chat._tcp", 
-      'local', 
-      Chatjour::Application::BONJOUR_PORT, 
-      text_record.encode
-    ).and_return(@broadcast)
-    Chatjour::Application.new.start do |app|; end
-  end
-  
-  it "can grab a list of users" do
-    reply = mock("reply", :name => "name", :type => "type", :domain => "domain")
-    DNSSD.should_receive(:browse).with("_chat._tcp").and_yield(reply).and_return(@browser)
-    resolve_reply = mock("reply", :target => "target", :port => "port")
-    DNSSD.should_receive(:resolve).with(reply.name, reply.type, reply.domain).and_yield(resolve_reply)
-    
-    Chatjour::Application.new.start do |app|
-      app.users.should == Set.new([Chatjour::User.new("name", "target", "port")])
-    end
-  end
-  
 end
