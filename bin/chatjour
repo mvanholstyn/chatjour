@@ -1,6 +1,12 @@
 #!/usr/bin/env ruby
 
+$: << File.expand_path(File.dirname(__FILE__) + '/../lib')
 require 'chatjour'
-require 'chatjour/cli'
+require 'chatjour/ncurses'
 
-Chatjour::Cli::Runner.start
+begin
+  Chatjour::Ncurses::Runner.start
+ensure
+  ::Ncurses.endwin
+end
+
