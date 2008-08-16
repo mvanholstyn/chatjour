@@ -46,7 +46,9 @@ describe Chatjour::Cli::View do
     output.string.should == "\t/users\n\t/help\n\t/available [message]\n\t/away [message]\n\t/invisible\n\t/visible\n\t/username message\n\tmessage\n"
   end
   
+  it "should show messages you send privately to others"
+  
   it "should be nicer"
   
-  it "should show messages you send privately to others"
+  it "should be include growl notifications"
 end
