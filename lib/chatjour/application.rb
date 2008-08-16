@@ -43,7 +43,6 @@ module Chatjour
         user = @users.detect{ |u| u.host == info[3] }
         messages << Message.new(body, user)
       end
-      messages
     rescue Errno::EAGAIN
       messages
     end
