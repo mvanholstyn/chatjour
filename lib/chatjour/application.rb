@@ -11,6 +11,8 @@ module Chatjour
     MULTICAST_ADDRESS = "225.4.5.6"
     MULTICAST_PORT = 5000
     MULTICAST_INTERFACE = "0.0.0.0"
+    
+    attr_reader :users
 
     def say(msg)
       begin
@@ -35,27 +37,23 @@ module Chatjour
     def start
       broadcast
       listen_for_incoming_messages
-    end
-    
-    def users
-      @users = Set.new
-      browser = DNSSD.browse("_chat._tcp") do |reply|
-        puts "Got a reply #{reply.inspect}"
-        DNSSD.resolve reply.name, reply.type, reply.domain do |resolve_reply|
-          puts "Got another reply #{resolve_reply.inspect}"
-          @users << User.new(reply.name, resolve_reply.target, resolve_reply.port)
-        end
+      find_users
+      if block_given?
+        yield self
+        stop
       end
-      
-      sleep 5
-      browser.stop
-      @users
     end
     
+    def stop
+      @broadcast.stop
+      @incoming_socket.close
+      @browser.stop
+    end
+        
   private
     def broadcast
       text_record = DNSSD::TextRecord.new
-      @service = DNSSD.register(Etc.getlogin, "_chat._tcp", 'local', BONJOUR_PORT, text_record.encode) do |resolve_reply|; end
+      @broadcast = DNSSD.register(Etc.getlogin, "_chat._tcp", 'local', BONJOUR_PORT, text_record.encode) do |resolve_reply|; end
     end
     
     def listen_for_incoming_messages
@@ -63,6 +61,15 @@ module Chatjour
       ip = IPAddr.new(MULTICAST_ADDRESS).hton + IPAddr.new(MULTICAST_INTERFACE).hton
       @incoming_socket.setsockopt(Socket::IPPROTO_IP, Socket::IP_ADD_MEMBERSHIP, ip)
       @incoming_socket.bind(Socket::INADDR_ANY, MULTICAST_PORT)
+    end
+    
+    def find_users
+      @users = Set.new
+      @browser = DNSSD.browse("_chat._tcp") do |reply|
+        DNSSD.resolve reply.name, reply.type, reply.domain do |resolve_reply|
+          @users << User.new(reply.name, resolve_reply.target, resolve_reply.port)
+        end
+      end
     end
   end
 end
