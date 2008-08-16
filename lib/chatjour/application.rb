@@ -1,8 +1,11 @@
 require 'dnssd'
 require 'etc'
 require 'ipaddr'
+require 'set'
 
 module Chatjour
+  User = Struct.new(:name, :host, :port)
+
   class Application
     BONJOUR_PORT = 5001
     MULTICAST_ADDRESS = "225.4.5.6"
@@ -32,6 +35,21 @@ module Chatjour
     def start
       broadcast
       listen_for_incoming_messages
+    end
+    
+    def users
+      @users = Set.new
+      browser = DNSSD.browse("_chat._tcp") do |reply|
+        puts "Got a reply #{reply.inspect}"
+        DNSSD.resolve reply.name, reply.type, reply.domain do |resolve_reply|
+          puts "Got another reply #{resolve_reply.inspect}"
+          @users << User.new(reply.name, resolve_reply.target, resolve_reply.port)
+        end
+      end
+      
+      sleep 5
+      browser.stop
+      @users
     end
     
   private

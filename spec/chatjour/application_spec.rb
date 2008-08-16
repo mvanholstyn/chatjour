@@ -69,4 +69,80 @@ describe Chatjour::Application do
     )
     Chatjour::Application.new.start
   end
+  
+  it "can grab a list of users" do
+    reply = mock("reply", :name => "name", :type => "type", :domain => "domain")
+    browser = mock("browser")
+    DNSSD.should_receive(:browse).with("_chat._tcp").and_yield(reply).and_return(browser)
+    resolve_reply = mock("reply", :name => "name", :target => "target", :port => "port")
+    DNSSD.should_receive(:resolve).with(reply.name, reply.type, reply.domain).and_yield(resolve_reply)
+    browser.should_receive(:stop)
+    
+    app = Chatjour::Application.new
+    app.start
+    app.users.should == Set.new([Chatjour::User.new("name", "target", "port")])
+  end
+  
+  it "can send private message"
+  
+  it "can receive private messages"
+  
 end
+
+__END__
+    User = Struct.new(:name, :host, :port)
+    class Done < RuntimeError; end
+  
+    def discover(timeout = 5)
+      # waiting_thread = Thread.current
+    
+      list = Set.new
+
+      dns = DNSSD.browse "_chat._tcp" do |reply|
+        DNSSD.resolve reply.name, reply.type, reply.domain do |resolve_reply|
+          service = User.new(reply.name, resolve_reply.target, resolve_reply.port)
+          # begin
+          #   list << service
+          # rescue Done
+          #   waiting_thread.run
+          # end
+        end
+      end
+    
+      sleep timeout
+      dns.stop
+      
+      list
+    end
+
+
+
+
+
+    def discover(timeout = 5)
+      waiting_thread = Thread.current
+    
+      dns = DNSSD.browse "_chat._tcp" do |reply|
+        DNSSD.resolve reply.name, reply.type, reply.domain do |resolve_reply|
+          service = ChatService.new(reply.name,
+                                   resolve_reply.target,
+                                   resolve_reply.port,
+                                   YAML.load(resolve_reply.text_record['chats'].to_s))
+          begin
+            yield service
+          rescue Done
+            waiting_thread.run
+          end
+        end
+      end
+    
+      puts "Gathering for up to #{timeout} seconds..."
+      sleep timeout
+      dns.stop
+    end
+    
+    def user_list
+      list = Set.new
+      discover { |obj| list << obj }
+      list
+    end
