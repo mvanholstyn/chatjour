@@ -53,6 +53,7 @@ module Chatjour
   private
     def broadcast
       text_record = DNSSD::TextRecord.new
+      text_record["placeholder"] = "so this resolves"
       @broadcast = DNSSD.register(Etc.getlogin, "_chat._tcp", 'local', BONJOUR_PORT, text_record.encode) do |resolve_reply|; end
     end
     
