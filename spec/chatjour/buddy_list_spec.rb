@@ -38,5 +38,17 @@ describe Chatjour::BuddyList do
     buddy_list.users.should == [Chatjour::User.new("name", "Available", "", "target", "port")]
   end
   
+  it "can lookup a user from their IP address" do
+    buddy_list = Chatjour::BuddyList.new
+    buddy_list.start
+    mark = Chatjour::User.new("name", "Away", "taking a nap", "1.2.3.4", "60")
+    zach = Chatjour::User.new("name", "Available", "", "5.6.7.8", "70")
+    buddy_list.add(mark)
+    buddy_list.add(zach)
+    Socket.stub!(:getaddrinfo).and_return([[nil, nil, nil,"5.6.7.8"]])
+    
+    buddy_list.lookup('5.6.7.8').should == zach
+  end
+  
   it "should remove users when they stop broadcasting"
 end

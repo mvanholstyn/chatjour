@@ -13,6 +13,10 @@ module Chatjour
       @users << new_user
     end
     
+    def lookup(ipaddr)
+      users.detect {|u| Socket.getaddrinfo(u.host, u.port).map{|a| a[3]}.include?(ipaddr) }
+    end
+    
     def start
       @browser = DNSSD.browse("_chat._tcp") do |reply|
         DNSSD.resolve(reply.name, reply.type, reply.domain) do |resolve_reply|

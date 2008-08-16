@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe Chatjour::Messenger do
   before do
     @mark = Chatjour::User.new("mark", "Available", nil, "10.0.0.1", 5000)
-    Socket.stub!(:getaddrinfo).and_return([[nil, nil, nil,"10.0.0.1"]])
+    @buddy_list = stub("buddy list", :users => [@mark], :lookup => nil)
   end
   
   it "can send chat messages" do
@@ -52,8 +52,7 @@ describe Chatjour::Messenger do
       messages.shift || raise(Errno::EAGAIN)
     end
 
-    buddy_list = stub("buddy list", :users => [@mark])
-    messenger = Chatjour::Messenger.new(buddy_list)
+    messenger = Chatjour::Messenger.new(@buddy_list)
     messenger.start
     messenger.receive.should == [Chatjour::Message.new("Hello world", nil)]
     messenger.stop
@@ -71,8 +70,7 @@ describe Chatjour::Messenger do
       messages.shift || raise(Errno::EAGAIN)
     end
     
-    buddy_list = stub("buddy list", :users => [@mark])
-    messenger = Chatjour::Messenger.new(buddy_list)
+    messenger = Chatjour::Messenger.new(@buddy_list)
     messenger.start
     messenger.receive.should == [
         Chatjour::Message.new("Hello world", nil),
@@ -91,8 +89,8 @@ describe Chatjour::Messenger do
     socket.stub!(:recvfrom_nonblock).and_return do
       messages.shift || raise(Errno::EAGAIN)
     end
-    buddy_list = stub("buddy list", :users => [@mark])    
-    messenger = Chatjour::Messenger.new(buddy_list)
+    messenger = Chatjour::Messenger.new(@buddy_list)
+    @buddy_list.stub!(:lookup).and_return(@mark)
     messenger.start
     messenger.receive.should == [Chatjour::Message.new("Hello world", @mark)]
     messenger.stop
