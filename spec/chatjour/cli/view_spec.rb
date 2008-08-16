@@ -48,8 +48,6 @@ describe Chatjour::Cli::View do
   end
   
   it "should show messages you send privately to others"
-  
-  it "should be nicer"
-  
+    
   it "should be include growl notifications"
 end
