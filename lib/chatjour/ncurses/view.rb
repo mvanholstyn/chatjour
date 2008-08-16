@@ -32,7 +32,7 @@ module Chatjour
       end
       
       def receive
-        # special characters don't work, but they echo uglyness
+        # special characters just echo uglyness
         case ch = @window.getch
           when -1
             # ignore
