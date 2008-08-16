@@ -24,6 +24,17 @@ module Chatjour
       end
     end
     
+    def tell(user, msg)
+      user = users.detect{ |u| u.name == user }
+      begin
+        socket = UDPSocket.open
+        socket.setsockopt(Socket::IPPROTO_IP, Socket::IP_TTL, [1].pack('i'))
+        socket.send(msg, 0, user.host, MULTICAST_PORT)
+      ensure
+        socket.close 
+      end      
+    end
+    
     def receive
       messages = []
       loop do
