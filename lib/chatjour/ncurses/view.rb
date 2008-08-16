@@ -50,7 +50,7 @@ module Chatjour
       def display_users(users)
         write "Available Users:"
         users.each do |user|
-          write "#{[user.name, user.status, user.message].delete_if { |u| u.empty? }.join(' - ')}"
+          write "  #{[user.name, user.status, user.message].delete_if { |u| u.empty? }.join(' - ')}"
         end
       end
       
