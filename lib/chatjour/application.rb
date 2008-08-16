@@ -18,5 +18,10 @@ module Chatjour
       puts "      Lists available users."
       puts
     end
+    
+    def self.users(*args)
+      puts "At some point, this will show you all the users."
+      puts
+    end
   end
 end
