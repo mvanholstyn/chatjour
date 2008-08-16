@@ -17,14 +17,14 @@ module Chatjour
           when /^\/available(?: (.*))?$/; @app.broadcaster.available($1)
           when /^\/away(?: (.*))?$/;      @app.broadcaster.away($1)
           when "/users";                  @view.display_users(@app.buddy_list.users)
-          when /^\/(\w+) (.*)$/;          @app.tell($1, $2)
-          else;                           @app.say(input)
+          when /^\/(\w+) (.*)$/;          @app.messenger.tell($1, $2)
+          else;                           @app.messenger.say(input)
         end
       end
     end
 
     def process_app
-      @view.display_messages(@app.receive)
+      @view.display_messages(@app.messenger.receive)
     end
   end
 end
