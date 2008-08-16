@@ -1,6 +1,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe Chatjour::Messenger do
+  before do
+    @mark = Chatjour::User.new("mark", "Available", nil, "10.0.0.1", 5000)
+    Socket.stub!(:getaddrinfo).and_return([[nil, nil, nil,"10.0.0.1"]])
+  end
+  
   it "can send chat messages" do
     socket = mock("socket", :null_object => true)
     UDPSocket.stub!(:open).and_return(socket)
@@ -47,9 +52,7 @@ describe Chatjour::Messenger do
       messages.shift || raise(Errno::EAGAIN)
     end
 
-    buddy_list = stub("buddy list", :users => [
-      Chatjour::User.new("mark", "Available", nil, "10.0.0.1", 5000)
-    ])
+    buddy_list = stub("buddy list", :users => [@mark])
     messenger = Chatjour::Messenger.new(buddy_list)
     messenger.start
     messenger.receive.should == [Chatjour::Message.new("Hello world", nil)]
@@ -68,9 +71,7 @@ describe Chatjour::Messenger do
       messages.shift || raise(Errno::EAGAIN)
     end
     
-    buddy_list = stub("buddy list", :users => [
-      Chatjour::User.new("mark", "Available", nil, "10.0.0.1", 5000)
-    ])
+    buddy_list = stub("buddy list", :users => [@mark])
     messenger = Chatjour::Messenger.new(buddy_list)
     messenger.start
     messenger.receive.should == [
@@ -81,7 +82,21 @@ describe Chatjour::Messenger do
     messenger.stop
   end
   
-  it "needs to receive messages with user attached"
+  it "needs to receive messages with user attached" do
+    socket = mock("socket", :null_object => true)
+    UDPSocket.stub!(:new).and_return(socket)
+    messages = [
+      ["Hello world", [nil, nil, nil, @mark.host]]
+    ]
+    socket.stub!(:recvfrom_nonblock).and_return do
+      messages.shift || raise(Errno::EAGAIN)
+    end
+    buddy_list = stub("buddy list", :users => [@mark])    
+    messenger = Chatjour::Messenger.new(buddy_list)
+    messenger.start
+    messenger.receive.should == [Chatjour::Message.new("Hello world", @mark)]
+    messenger.stop
+  end
 
   it "receives nothing when there is nothing there to receive" do
     socket = mock("socket", :null_object => true)

@@ -26,14 +26,14 @@ module Chatjour
         socket.send(msg, 0, user.host, MULTICAST_PORT)
       ensure
         socket.close 
-      end      
+      end
     end
     
     def receive
       messages = []
       loop do
         body, info = @incoming_socket.recvfrom_nonblock(1024)
-        user = @buddy_list.users.detect { |u| u.host == info[3] }
+        user = @buddy_list.users.detect { |u| Socket.getaddrinfo(u.host, u.port).map{|a| a[3]}.include?(info[3]) }
         messages << Message.new(body, user)
       end
     rescue Errno::EAGAIN

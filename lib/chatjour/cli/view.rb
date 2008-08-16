@@ -19,7 +19,7 @@ module Chatjour
 
       def display_messages(messages)
         messages.each do |message|
-          @output.puts "Message: #{message.body}"
+          @output.puts "#{message.user.name}: #{message.body}"
         end
       end
 

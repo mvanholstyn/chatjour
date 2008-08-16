@@ -31,12 +31,13 @@ describe Chatjour::Cli::View do
   it "displays messages" do
     output = StringIO.new
     view = Chatjour::Cli::View.new(:output => output)
+    mark = Chatjour::User.new("mark", "Available", nil, "10.0.0.1", 5000)
     messages = [
-      stub("message", :body => "How is everyone?"),
-      stub("message", :body => "I am good.")
+      stub("message", :user => mark, :body => "How is everyone?"),
+      stub("message", :user => mark, :body => "I am good.")
     ]
     view.display_messages(messages)
-    output.string.should == "Message: How is everyone?\nMessage: I am good.\n"
+    output.string.should == "mark: How is everyone?\nmark: I am good.\n"
   end
 
   it "displays help" do
