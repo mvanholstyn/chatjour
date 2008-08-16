@@ -13,7 +13,7 @@ module Chatjour
       
       def display_users(users)
         users.each do |user|
-          @output.puts "\t#{[user.name, user.status, user.message].compact.join(' - ')}"
+          @output.puts "\t#{[user.name, user.status, user.message].delete_if { |u| u.empty? }.join(' - ')}"
         end
       end
 

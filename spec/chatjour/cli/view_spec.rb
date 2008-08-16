@@ -22,7 +22,7 @@ describe Chatjour::Cli::View do
     view = Chatjour::Cli::View.new(:output => output)
     users = [
       stub("user", :name => "mvanholstyn", :status => "Away", :message => "taking a nap"),
-      stub("user", :name => "zdennis", :status => "Available", :message => nil)
+      stub("user", :name => "zdennis", :status => "Available", :message => "")
     ]
     view.display_users(users)
     output.string.should == "\tmvanholstyn - Away - taking a nap\n\tzdennis - Available\n"

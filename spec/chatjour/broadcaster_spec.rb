@@ -5,7 +5,7 @@ describe Chatjour::Broadcaster do
     broadcast = stub("broadcast")
     text_record = DNSSD::TextRecord.new
     text_record['status'] = "Available"
-    text_record['message'] = nil
+    text_record['message'] = ""
     DNSSD.should_receive(:register).with(
       Etc.getlogin, 
       "_chat._tcp", 
@@ -53,7 +53,7 @@ describe Chatjour::Broadcaster do
     broadcast.should_receive(:stop)
     text_record = DNSSD::TextRecord.new
     text_record['status'] = "Away"
-    text_record['message'] = nil
+    text_record['message'] = ""
     DNSSD.should_receive(:register).with(
       Etc.getlogin, 
       "_chat._tcp", 
@@ -101,7 +101,7 @@ describe Chatjour::Broadcaster do
     broadcast.should_receive(:stop)
     text_record = DNSSD::TextRecord.new
     text_record['status'] = "Available"
-    text_record['message'] = nil
+    text_record['message'] = ""
     DNSSD.should_receive(:register).with(
       Etc.getlogin, 
       "_chat._tcp", 

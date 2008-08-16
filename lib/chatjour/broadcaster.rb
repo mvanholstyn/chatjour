@@ -25,7 +25,7 @@ module Chatjour
     def start
       text_record = DNSSD::TextRecord.new
       text_record['status']  = @status
-      text_record['message'] = @message
+      text_record['message'] = @message.to_s
       @broadcast = DNSSD.register(Etc.getlogin, "_chat._tcp", 'local', PORT, text_record.encode) do |resolve_reply|; end
     end
     
