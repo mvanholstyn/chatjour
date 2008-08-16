@@ -22,7 +22,7 @@ describe Chatjour::Cli::View do
     view = Chatjour::Cli::View.new(:output => output)
     users = [
       stub("user", :name => "mvanholstyn", :status => "Away", :message => "taking a nap"),
-      stub("user", :name => "zdennis", :status => "Available", :message => nil)
+      stub("user", :name => "zdennis", :status => "Available", :message => "")
     ]
     view.display_users(users)
     output.string.should == "\tmvanholstyn - Away - taking a nap\n\tzdennis - Available\n"
@@ -43,6 +43,10 @@ describe Chatjour::Cli::View do
     output = StringIO.new
     view = Chatjour::Cli::View.new(:output => output)
     view.display_help
-    output.string.should == "\t/users\n\t/help\n\t/username message\n\tmessage\n"
+    output.string.should == "\t/users\n\t/help\n\t/available [message]\n\t/away [message]\n\t/invisible\n\t/visible\n\t/username message\n\tmessage\n"
   end
+  
+  it "should be nicer"
+  
+  it "should show messages you send privately to others"
 end
