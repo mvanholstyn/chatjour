@@ -1,0 +1,26 @@
+Story: Chatjour
+
+  As a command line junkie
+  I should be able to chat over the command line
+  So that I can be uber sweet. (think Cartman Sweeet)
+  
+  Scenario: Listing users
+    Given I start up Chatjour
+    When I ask for a list of users
+    Then I should see a list of users registered to talk over Chatjour
+  
+  Scenario: Sending a message
+    Given Bob starts up Chatjour
+    And Fred starts up Chatjour
+    And Mary starts up Chatjour
+    When Bob sends the message: Hi Fred!
+    The Fred should see Bob's message: Hi Fred!
+    And Mary should see Bob's message: Hi Fred!
+  
+  Scenario: Sending a private message to a user
+    Given Bob starts up Chatjour
+    And Fred starts up Chatjour
+    And Mary starts up Chatjour
+    When Bob sends Fred the private message: the penguin is lazy
+    Then Fred should see Bob's message: the penguin is lazy
+    And Mary should not see Bob's message
