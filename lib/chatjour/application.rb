@@ -5,6 +5,8 @@ Thread.abort_on_exception = true
  
 module Chatjour
   class Application
+    ChatService = Struct.new(:name, :host, :port, :description)
+    
     def self.run(*args)
       new(*args).run
     end
@@ -32,7 +34,7 @@ module Chatjour
     
       dns = DNSSD.browse "_chat._tcp" do |reply|
         DNSSD.resolve reply.name, reply.type, reply.domain do |resolve_reply|
-          service = GitService.new(reply.name,
+          service = ChatService.new(reply.name,
                                    resolve_reply.target,
                                    resolve_reply.port,
                                    resolve_reply.text_record['description'].to_s)
