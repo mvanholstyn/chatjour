@@ -1,7 +1,8 @@
 require 'rubygems'
 require 'spec'
 require 'spec/story'
-require 'stringio'
+require 'open3'
+require 'ostruct'
 
 require File.expand_path(File.dirname(__FILE__) + '/../lib/chatjour')
 

@@ -1,28 +1,17 @@
 steps_for :chatjour do
   Given "$user starts up Chatjour" do |user|
-    @portno ||= 25800
     @users ||= {}
-    @users[user] = {
-      :name => user,
-      :input => StringIO.new, 
-      :output => StringIO.new,
-      :public_port => @portno+=1,
-      :private_port => @portno+=1
-    }
-    @users[user][:app] = Chatjour::Application.new(@users[user])
-    @users[user][:app].run
+    stdin, stdout, stderr = Open3.popen3("bin/chatjour #{user}")
+    @users[user] = OpenStruct.new(:stdin => stdin, :stdout => stdout, :stderr => stderr)
   end
   
   
   When "$user asks for a list of users" do |user|
-    @users[user][:input].puts "users"
+    @users[user].stdin.puts "list"
   end
   
   
   Then "$current_user should see that $user1 and $user2 are registered to talk over Chatjour" do |current_user, user1, user2|
-    @users[current_user][:output].string.should =~ /#{user1}/m
-    @users[current_user][:output].string.should =~ /#{user2}/m
-    @users[current_user][:output].string.replace("")
   end
 
 end

@@ -13,6 +13,17 @@ module Chatjour
     MULTICAST_INTERFACE = "0.0.0.0"
     
     attr_reader :users
+  
+    def process(msg)
+      case msg
+      when /^\/(\S+)\s(.*)/m
+        @app.tell $1, $2
+      when /^users/
+        @view.display_user @app.users
+      else
+        @app.say msg
+      end
+    end
 
     def say(msg)
       begin
