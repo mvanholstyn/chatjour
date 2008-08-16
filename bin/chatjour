@@ -2,4 +2,8 @@
 
 require 'chatjour'
 
+trap "INT" do
+  exit!
+end
+
 Chatjour::Application.run(*ARGV)
