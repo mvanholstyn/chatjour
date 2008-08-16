@@ -1,1 +1,1 @@
-require 'chatjour/application'
+require File.dirname(__FILE__) + '/chatjour/application'

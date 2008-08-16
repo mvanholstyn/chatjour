@@ -9,11 +9,11 @@ Story: Chatjour
     And Fred starts up Chatjour
     And Mary starts up Chatjour
     When Bob asks for a list of users
-    Then Bob should see a list of users registered to talk over Chatjour
+    Then Bob should see that Mary and Fred are registered to talk over Chatjour
     When Fred asks for a list of users
-    Then Fred should see a list of users registered to talk over Chatjour
+    Then Fred should see that Mary and Bob are registered to talk over Chatjour
     When Mary asks for a list of users
-    Then Mary should see a list of users registered to talk over Chatjour    
+    Then Mary should see that Fred and Bob are registered to talk over Chatjour
   
   Scenario: Sending a message
     Given Bob starts up Chatjour
