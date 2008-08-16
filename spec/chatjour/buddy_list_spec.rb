@@ -37,4 +37,6 @@ describe Chatjour::BuddyList do
     buddy_list.add(Chatjour::User.new("name", "Available", "", "target", "port"))
     buddy_list.users.should == [Chatjour::User.new("name", "Available", "", "target", "port")]
   end
+  
+  it "should remove users when they stop broadcasting"
 end
