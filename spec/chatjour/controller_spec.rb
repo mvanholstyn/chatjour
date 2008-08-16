@@ -43,7 +43,8 @@ describe Chatjour::Controller do
   end
 
   it "processes user input for users list" do
-    view, app = stub("view", :receive => "/users", :display_messages => nil), stub("app", :start => nil, :receive => [], :users => "array of users")
+    buddy_list = stub("buddy_list", :users => "array of users")
+    view, app = stub("view", :receive => "/users", :display_messages => nil), stub("app", :start => nil, :receive => [], :buddy_list => buddy_list)
     view.should_receive(:display_users).with("array of users")
     Chatjour::Controller.new(app, view).process
   end

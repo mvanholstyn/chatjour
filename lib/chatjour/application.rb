@@ -1,7 +1,5 @@
 require 'dnssd'
-require 'etc'
 require 'ipaddr'
-require 'set'
 
 module Chatjour
   User = Struct.new(:name, :status, :message, :host, :port)
@@ -12,7 +10,7 @@ module Chatjour
     MULTICAST_PORT = 5000
     MULTICAST_INTERFACE = "0.0.0.0"
     
-    attr_reader :broadcaster, :users
+    attr_reader :broadcaster, :buddy_list
 
     def say(msg)
       begin
@@ -25,7 +23,7 @@ module Chatjour
     end
     
     def tell(user, msg)
-      user = @users.detect{ |u| u.name == user }
+      user = @buddy_list.users.detect { |u| u.name == user }
       begin
         socket = UDPSocket.open
         socket.setsockopt(Socket::IPPROTO_IP, Socket::IP_TTL, [1].pack('i'))
@@ -39,7 +37,7 @@ module Chatjour
       messages = []
       loop do
         body, info = @incoming_socket.recvfrom_nonblock(1024)
-        user = @users.detect{ |u| u.host == info[3] }
+        user = @buddy_list.users.detect { |u| u.host == info[3] }
         messages << Message.new(body, user)
       end
     rescue Errno::EAGAIN
@@ -59,7 +57,7 @@ module Chatjour
     def stop
       @broadcaster.stop
       @incoming_socket.close
-      @browser.stop
+      @buddy_list.stop
     end
         
   private
@@ -76,12 +74,8 @@ module Chatjour
     end
     
     def find_users
-      @users = Set.new
-      @browser = DNSSD.browse("_chat._tcp") do |reply|
-        DNSSD.resolve reply.name, reply.type, reply.domain do |resolve_reply|
-          @users << User.new(reply.name, resolve_reply.text_record['status'], resolve_reply.text_record['message'], resolve_reply.target, resolve_reply.port)
-        end
-      end
+      @buddy_list = BuddyList.new
+      @buddy_list.start
     end
   end
 end

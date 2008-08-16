@@ -1,3 +1,5 @@
+require 'etc'
+
 module Chatjour
   class Broadcaster
     PORT = 5001

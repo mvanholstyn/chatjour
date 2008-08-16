@@ -2,11 +2,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe Chatjour::Application do
   before(:each) do
-    @broadcast = stub("broadcast", :stop => nil)
-    DNSSD.stub!(:register).and_return(@broadcast)
-    
-    @browser = mock("browser", :stop => nil)
-    DNSSD.stub!(:browse).and_return(@browser)
+    @broadcaster = stub("broadcaster", :start => nil, :stop => nil)
+    Chatjour::Broadcaster.stub!(:new).and_return(@broadcaster)
+
+    @buddy_list = stub("buddy list", :start => nil, :stop => nil, :users => [])
+    Chatjour::BuddyList.stub!(:new).and_return(@buddy_list)
   end
 
   it "can send chat messages" do
@@ -25,17 +25,16 @@ describe Chatjour::Application do
   end
   
   it "can send private message" do
-    reply = mock("reply", :name => "mark", :type => "type", :domain => "domain")
-    DNSSD.should_receive(:browse).with("_chat._tcp").and_yield(reply).and_return(@browser)
-    resolve_reply = mock("reply", :target => "MarksTargetAddress", :port => "port", :text_record => stub("text_record", :[] => nil))
-    DNSSD.should_receive(:resolve).with(reply.name, reply.type, reply.domain).and_yield(resolve_reply)
+    @buddy_list.stub!(:users).and_return([
+      Chatjour::User.new("mark", "Available", nil, "10.0.0.1", 5000)
+    ])
 
     socket = mock("socket", :null_object => true)
     UDPSocket.stub!(:open).and_return(socket)
     socket.should_receive(:send).with(
       "howdy!",
       anything,
-      "MarksTargetAddress", 
+      "10.0.0.1", 
       Chatjour::Application::MULTICAST_PORT
     )
 
@@ -96,26 +95,14 @@ describe Chatjour::Application do
   end
 
   it "starts/stops a broadcaster" do
-    broadcaster = stub("broadcaster")
-    broadcaster.should_receive(:start)
-    broadcaster.should_receive(:stop)
-    Chatjour::Broadcaster.stub!(:new).and_return(broadcaster)
+    @broadcaster.should_receive(:start)
+    @broadcaster.should_receive(:stop)
     Chatjour::Application.new.start do |app|; end
   end
   
-  it "can grab a list of users" do
-    text_record = stub("text_record")
-    text_record.should_receive(:[]).with("status").and_return("Away")
-    text_record.should_receive(:[]).with("message").and_return("taking a nap")
-    
-    reply = mock("reply", :name => "name", :type => "type", :domain => "domain")
-    DNSSD.should_receive(:browse).with("_chat._tcp").and_yield(reply).and_return(@browser)
-    resolve_reply = mock("reply", :target => "target", :port => "port", :text_record => text_record)
-    DNSSD.should_receive(:resolve).with(reply.name, reply.type, reply.domain).and_yield(resolve_reply)
-    
-    Chatjour::Application.new.start do |app|
-      app.users.should == Set.new([Chatjour::User.new("name", "Away", "taking a nap", "target", "port")])
-    end
+  it "starts/stops a buddy list" do
+    @buddy_list.should_receive(:start)
+    @buddy_list.should_receive(:stop)
+    Chatjour::Application.new.start do |app|; end
   end
-  
 end
