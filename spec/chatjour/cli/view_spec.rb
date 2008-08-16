@@ -43,6 +43,6 @@ describe Chatjour::Cli::View do
     output = StringIO.new
     view = Chatjour::Cli::View.new(:output => output)
     view.display_help
-    output.string.should == "\t/users\n\t/help\n\t/available [message]\n\t/away [message]\n\t/username message\n\tmessage\n"
+    output.string.should == "\t/users\n\t/help\n\t/available [message]\n\t/away [message]\n\t/invisible\n\t/visible\n\t/username message\n\tmessage\n"
   end
 end

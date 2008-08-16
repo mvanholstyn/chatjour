@@ -28,6 +28,8 @@ module Chatjour
                      "\t/help", 
                      "\t/available [message]",
                      "\t/away [message]",
+                     "\t/invisible",
+                     "\t/visible",
                      "\t/username message", 
                      "\tmessage"
       end

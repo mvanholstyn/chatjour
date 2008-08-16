@@ -44,6 +44,18 @@ describe Chatjour::Controller do
     @broadcaster.should_receive(:away).with("taking a nap")
     Chatjour::Controller.new(@app, @view).process
   end
+  
+  it "processes user input for setting status as away with a message" do
+    @view.stub!(:receive).and_return("/invisible")
+    @broadcaster.should_receive(:stop)
+    Chatjour::Controller.new(@app, @view).process
+  end
+  
+  it "processes user input for setting status as away with a message" do
+    @view.stub!(:receive).and_return("/visible")
+    @broadcaster.should_receive(:start)
+    Chatjour::Controller.new(@app, @view).process
+  end
 
   it "processes user input for users list" do
     @view.stub!(:receive).and_return("/users")

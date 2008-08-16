@@ -16,6 +16,8 @@ module Chatjour
           when "/help";                   @view.display_help
           when /^\/available(?: (.*))?$/; @app.broadcaster.available($1)
           when /^\/away(?: (.*))?$/;      @app.broadcaster.away($1)
+          when "/invisible";              @app.broadcaster.stop
+          when "/visible";                @app.broadcaster.start
           when "/users";                  @view.display_users(@app.buddy_list.users)
           when /^\/(\w+) (.*)$/;          @app.messenger.tell($1, $2)
           else;                           @app.messenger.say(input)
