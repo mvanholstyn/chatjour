@@ -8,7 +8,6 @@ module Chatjour
         @window.getmaxyx(@lines, @columns)
         @lines, @columns = @lines.first, @columns.first
         ::Ncurses.cbreak
-        # ::Ncurses.noecho
         ::Ncurses.nodelay(@window, true)
         prompt
       end
@@ -40,16 +39,6 @@ module Chatjour
           @buffer << ch.chr
           nil
         end
-        # @window.wgetstr(@buffer)
-        # if @buffer.empty?
-        #   nil
-        # else
-        #   # write("word...")
-        #   prompt
-        #   input = @buffer
-        #   @buffer = ""
-        #   input
-        # end
       end
       
       def display_users(users)
