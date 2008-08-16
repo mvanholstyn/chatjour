@@ -1,4 +1,5 @@
 require 'etc'
+require 'set'
 require 'dnssd'
 
 Thread.abort_on_exception = true
@@ -12,12 +13,12 @@ module Chatjour
     end
 
     def initialize(*args)
-      @port, @username = 1323, Etc.getlogin
+      @port, @username, @in, @out = 1323, Etc.getlogin, STDIN, STDOUT
     end
     
     def run
       register
-      users
+      listen
     end
     
     def register
@@ -25,36 +26,42 @@ module Chatjour
       tr['description'] = @username
       
       DNSSD.register(@username, "_chat._tcp", 'local', @port, tr.encode) do |rr|
-        puts "Registered #{@username} on port #{@port}. Starting Chatjour."
+        @out.puts "Registered #{@username} on port #{@port}. Starting Chatjour."
       end
     end
-
-    def discover(timeout = 5)
-      waiting_thread = Thread.current
     
-      dns = DNSSD.browse "_chat._tcp" do |reply|
-        DNSSD.resolve reply.name, reply.type, reply.domain do |resolve_reply|
-          service = ChatService.new(reply.name,
-                                   resolve_reply.target,
-                                   resolve_reply.port,
-                                   resolve_reply.text_record['description'].to_s)
-          begin
-            yield service
-          rescue Done
-            waiting_thread.run
-          end
-        end
+    def listen
+      @in.each do |command|
+        @out.puts "Got: #{command}"
       end
-    
-      puts "Gathering for up to #{timeout} seconds..."
-      sleep timeout
-      dns.stop
     end
     
-    def users
-      list = []
-      discover { |obj| list << obj }
-      list
-    end
+    # def discover(timeout = 20)
+    #   waiting_thread = Thread.current
+    # 
+    #   dns = DNSSD.browse "_chat._tcp" do |reply|
+    #     DNSSD.resolve reply.name, reply.type, reply.domain do |resolve_reply|
+    #       service = ChatService.new(reply.name,
+    #                                resolve_reply.target,
+    #                                resolve_reply.port,
+    #                                resolve_reply.text_record['description'].to_s)
+    #       begin
+    #         yield service
+    #       rescue Done
+    #         waiting_thread.run
+    #       end
+    #     end
+    #   end
+    # 
+    #   puts "Gathering for up to #{timeout} seconds..."
+    #   sleep timeout
+    #   dns.stop
+    # end
+    # 
+    # def users
+    #   list = Set.new
+    #   discover { |obj| list << obj }
+    #   list
+    # end
   end
 end
