@@ -2,7 +2,6 @@ require 'dnssd'
 require 'ipaddr'
 
 module Chatjour
-  User = Struct.new(:name, :status, :message, :host, :port)
   Message = Struct.new(:body, :user)
 
   class Application

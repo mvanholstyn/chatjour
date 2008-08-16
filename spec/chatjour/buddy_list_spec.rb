@@ -15,7 +15,7 @@ describe Chatjour::BuddyList do
     
     buddy_list = Chatjour::BuddyList.new
     buddy_list.start
-    buddy_list.users.should == Set.new([Chatjour::User.new("name", "Away", "taking a nap", "target", "port")])
+    buddy_list.users.should == [Chatjour::User.new("name", "Away", "taking a nap", "target", "port")]
   end
 
   it "stops gathering users over bonjour" do
@@ -25,5 +25,16 @@ describe Chatjour::BuddyList do
     buddy_list = Chatjour::BuddyList.new
     buddy_list.start
     buddy_list.stop
+  end
+  
+  it "replaces user in buddy list of attributes change" do
+    browser = stub("browser")
+    DNSSD.stub!(:browse).and_return(browser)
+    
+    buddy_list = Chatjour::BuddyList.new
+    buddy_list.start
+    buddy_list.add(Chatjour::User.new("name", "Away", "taking a nap", "target", "port"))
+    buddy_list.add(Chatjour::User.new("name", "Available", "", "target", "port"))
+    buddy_list.users.should == [Chatjour::User.new("name", "Available", "", "target", "port")]
   end
 end
