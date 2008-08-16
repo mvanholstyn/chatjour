@@ -5,9 +5,15 @@ Story: Chatjour
   So that I can be uber sweet. (think Cartman Sweeet)
   
   Scenario: Listing users
-    Given I start up Chatjour
-    When I ask for a list of users
-    Then I should see a list of users registered to talk over Chatjour
+    Given Bob starts up Chatjour
+    And Fred starts up Chatjour
+    And Mary starts up Chatjour
+    When Bob asks for a list of users
+    Then Bob should see a list of users registered to talk over Chatjour
+    When Fred asks for a list of users
+    Then Fred should see a list of users registered to talk over Chatjour
+    When Mary asks for a list of users
+    Then Mary should see a list of users registered to talk over Chatjour    
   
   Scenario: Sending a message
     Given Bob starts up Chatjour
