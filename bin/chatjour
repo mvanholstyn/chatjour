@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'gitjour'
+require 'chatjour'
 
 Chatjour::Application.run(*ARGV)
