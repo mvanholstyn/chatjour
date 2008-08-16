@@ -8,15 +8,43 @@ describe Chatjour::Controller do
     Chatjour::Controller.new(app, view)
   end
   
-  it "processes user input for users list" do
-    view, app = stub("view", :receive => "/users", :display_messages => nil), stub("app", :start => nil, :receive => [], :users => "array of users")
-    view.should_receive(:display_users).with("array of users")
-    Chatjour::Controller.new(app, view).process
-  end
-  
   it "processes user input for help" do
     view, app = stub("view", :receive => "/help", :display_messages => nil), stub("app", :start => nil, :receive => [])
     view.should_receive(:display_help)
+    Chatjour::Controller.new(app, view).process
+  end
+  
+  it "processes user input for setting status as available with no message" do
+    broadcaster = stub("broadcaster")
+    view, app = stub("view", :receive => "/available", :display_messages => nil), stub("app", :start => nil, :receive => [], :broadcaster => broadcaster)
+    broadcaster.should_receive(:available).with(nil)
+    Chatjour::Controller.new(app, view).process
+  end
+  
+  it "processes user input for setting status as available with a message" do
+    broadcaster = stub("broadcaster")
+    view, app = stub("view", :receive => "/available hanging out", :display_messages => nil), stub("app", :start => nil, :receive => [], :broadcaster => broadcaster)
+    broadcaster.should_receive(:available).with("hanging out")
+    Chatjour::Controller.new(app, view).process
+  end
+  
+  it "processes user input for setting status as away with no message" do
+    broadcaster = stub("broadcaster")
+    view, app = stub("view", :receive => "/away", :display_messages => nil), stub("app", :start => nil, :receive => [], :broadcaster => broadcaster)
+    broadcaster.should_receive(:away).with(nil)
+    Chatjour::Controller.new(app, view).process
+  end
+  
+  it "processes user input for setting status as away with a message" do
+    broadcaster = stub("broadcaster")
+    view, app = stub("view", :receive => "/away taking a nap", :display_messages => nil), stub("app", :start => nil, :receive => [], :broadcaster => broadcaster)
+    broadcaster.should_receive(:away).with("taking a nap")
+    Chatjour::Controller.new(app, view).process
+  end
+
+  it "processes user input for users list" do
+    view, app = stub("view", :receive => "/users", :display_messages => nil), stub("app", :start => nil, :receive => [], :users => "array of users")
+    view.should_receive(:display_users).with("array of users")
     Chatjour::Controller.new(app, view).process
   end
   

@@ -13,10 +13,12 @@ module Chatjour
     def process_view
       if input = @view.receive
         case input
-          when "/users";         @view.display_users(@app.users)
-          when "/help";          @view.display_help
-          when /^\/(\w+) (.*)$/; @app.tell($1, $2)
-          else;                  @app.say(input)
+          when "/help";                 @view.display_help
+          when /\/available(?: (.*))?/; @app.broadcaster.available($1)
+          when /\/away(?: (.*))?/;      @app.broadcaster.away($1)
+          when "/users";                @view.display_users(@app.users)
+          when /^\/(\w+) (.*)$/;        @app.tell($1, $2)
+          else;                         @app.say(input)
         end
       end
     end

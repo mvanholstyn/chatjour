@@ -4,16 +4,15 @@ require 'ipaddr'
 require 'set'
 
 module Chatjour
-  User = Struct.new(:name, :host, :port)
+  User = Struct.new(:name, :status, :message, :host, :port)
   Message = Struct.new(:body, :user)
 
   class Application
-    BONJOUR_PORT = 5001
     MULTICAST_ADDRESS = "225.4.5.6"
     MULTICAST_PORT = 5000
     MULTICAST_INTERFACE = "0.0.0.0"
     
-    attr_reader :users
+    attr_reader :broadcaster, :users
 
     def say(msg)
       begin
@@ -58,16 +57,15 @@ module Chatjour
     end
     
     def stop
-      @broadcast.stop
+      @broadcaster.stop
       @incoming_socket.close
       @browser.stop
     end
         
   private
     def broadcast
-      text_record = DNSSD::TextRecord.new
-      text_record["placeholder"] = "so this resolves"
-      @broadcast = DNSSD.register(Etc.getlogin, "_chat._tcp", 'local', BONJOUR_PORT, text_record.encode) do |resolve_reply|; end
+      @broadcaster = Broadcaster.new
+      @broadcaster.start
     end
     
     def listen_for_incoming_messages
@@ -81,7 +79,7 @@ module Chatjour
       @users = Set.new
       @browser = DNSSD.browse("_chat._tcp") do |reply|
         DNSSD.resolve reply.name, reply.type, reply.domain do |resolve_reply|
-          @users << User.new(reply.name, resolve_reply.target, resolve_reply.port)
+          @users << User.new(reply.name, resolve_reply.text_record['status'], resolve_reply.text_record['message'], resolve_reply.target, resolve_reply.port)
         end
       end
     end

@@ -21,11 +21,11 @@ describe Chatjour::Cli::View do
     output = StringIO.new
     view = Chatjour::Cli::View.new(:output => output)
     users = [
-      stub("user", :name => "mvanholstyn"),
-      stub("user", :name => "zdennis")
+      stub("user", :name => "mvanholstyn", :status => "Away", :message => "taking a nap"),
+      stub("user", :name => "zdennis", :status => "Available", :message => nil)
     ]
     view.display_users(users)
-    output.string.should == "\tmvanholstyn\n\tzdennis\n"
+    output.string.should == "\tmvanholstyn - Away - taking a nap\n\tzdennis - Available\n"
   end
 
   it "displays messages" do
