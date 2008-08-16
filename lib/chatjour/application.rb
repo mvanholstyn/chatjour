@@ -5,6 +5,7 @@ require 'set'
 
 module Chatjour
   User = Struct.new(:name, :host, :port)
+  Message = Struct.new(:body, :user)
 
   class Application
     BONJOUR_PORT = 5001
@@ -25,7 +26,7 @@ module Chatjour
     end
     
     def tell(user, msg)
-      user = users.detect{ |u| u.name == user }
+      user = @users.detect{ |u| u.name == user }
       begin
         socket = UDPSocket.open
         socket.setsockopt(Socket::IPPROTO_IP, Socket::IP_TTL, [1].pack('i'))
@@ -38,7 +39,9 @@ module Chatjour
     def receive
       messages = []
       loop do
-        messages << @incoming_socket.recvfrom_nonblock(1024).first
+        body, info = @incoming_socket.recvfrom_nonblock(1024)
+        user = @users.detect{ |u| u.host == info[3] }
+        messages << Message.new(body, user)
       end
       messages
     rescue Errno::EAGAIN

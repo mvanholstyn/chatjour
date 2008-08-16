@@ -54,7 +54,7 @@ describe Chatjour::Application do
       messages.shift || raise(Errno::EAGAIN)
     end
     Chatjour::Application.new.start do |app|
-      app.receive.should == ["Hello world"]
+      app.receive.should == [Chatjour::Message.new("Hello world", nil)]
     end
   end
 
@@ -70,7 +70,11 @@ describe Chatjour::Application do
       messages.shift || raise(Errno::EAGAIN)
     end
     Chatjour::Application.new.start do |app|
-      app.receive.should == ["Hello world", "Bye again", "Hello again"]
+      app.receive.should == [
+        Chatjour::Message.new("Hello world", nil),
+        Chatjour::Message.new("Bye again", nil),
+        Chatjour::Message.new("Hello again", nil)
+      ]
     end
   end
 
